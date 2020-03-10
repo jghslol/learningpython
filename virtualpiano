@@ -1,0 +1,173 @@
+import Tkinter
+import pygame
+from Tkinter import *
+from pygame import mixer
+import numpy as np
+
+def lowerd(): 
+    file1 = open('316072__feelander__piano-mf-d3.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+
+def lowere(): 
+    file2 = open('316067__feelander__piano-mf-e3.aiff')
+    mixer.init()
+    mixer.music.load(file2)
+    mixer.music.play()
+
+def lowerf(): 
+    file2 = open('316067__feelander__piano-mf-e3.aiff')
+    mixer.init()
+    mixer.music.load(file2)
+    mixer.music.play()
+
+def lowerg(): 
+    file1 = open('316017__feelander__piano-mf-g3.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+
+def middlea(): 
+    file1 = open('316005__feelander__piano-mf-a3.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+
+def middleb(): 
+    file1 = open('316063__feelander__piano-mf-b3.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+
+def middlec(): 
+    file1 = open('316083__feelander__piano-mf-c4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+
+def middled(): 
+    file1 = open('316029__feelander__piano-mf-d4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()  
+
+def middlee(): 
+    file1 = open('316053__feelander__piano-mf-e4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+
+def middlef(): 
+    file1 = open('316025__feelander__piano-mf-f4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+    
+def middleg(): 
+    file1 = open('316055__feelander__piano-mf-g4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()    
+    
+def uppera(): 
+   file1 = open('316004__feelander__piano-mf-a4.aiff')
+   mixer.init()
+   mixer.music.load(file1)
+   mixer.music.play()
+   
+def upperb(): 
+    file1 = open('316069__feelander__piano-mf-b4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+
+def upperc(): 
+    file1 = open('316082__feelander__piano-mf-c5.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+    
+def fsharph(): 
+    file1 = open('316021__feelander__piano-mf-gb4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+
+def fsharpl(): 
+    file1 = open('316020__feelander__piano-mf-gb3.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()   
+
+def gsharpl(): 
+    file1 = open('316012__feelander__piano-mf-ab3.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+    
+def gsharph(): 
+    file1 = open('316062__feelander__piano-mf-ab4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()  
+
+def asharp(): 
+    file1 = open('316044__feelander__piano-mf-bb4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+    
+def csharp(): 
+    file1 = open('316036__feelander__piano-mf-db4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+    
+def dsharp(): 
+    file1 = open('316050__feelander__piano-mf-eb4.aiff')
+    mixer.init()
+    mixer.music.load(file1)
+    mixer.music.play()
+    
+window = Tk()
+            
+window.geometry('690x400')
+window.resizable(0,0)
+window.title('Simple Piano')
+            
+frame1 = Frame(window, width = 600, height = 100)
+            
+blackkeyframe = Frame(window, width = 600, height = 100, background = 'gray99', highlightbackground = 'brown')
+blackkeyframe.pack(side = TOP)
+            
+boxframe = Frame(window, width = 600, height = 100, background = 'gray99', highlightbackground = 'brown')
+boxframe.pack(side = BOTTOM)
+        
+window.configure(bg = 'black')
+
+key1 = Button(boxframe, text = 'D', width = 5, height = 15,  highlightbackground ="black", command = lowerd).grid(row = 0, column = 0, columnspan = 1)
+key2 = Button(boxframe, text = 'E', width = 5, height = 15,  highlightbackground ="black", command = lowere).grid(row = 0, column = 1, columnspan = 1)
+key3 = Button(boxframe, text = 'F', width = 5, height = 15,  highlightbackground ="black", command = lowerf).grid(row = 0, column = 2, columnspan = 1)
+key4 = Button(boxframe, text = 'G', width = 5, height = 15,  highlightbackground ="black", command = lowerg).grid(row = 0, column = 3, columnspan = 1)
+key5 = Button(boxframe, text = 'A', width = 5, height = 15,  highlightbackground ="black", command =middlea).grid(row = 0, column = 4, columnspan = 1)
+key6 = Button(boxframe, text = 'B', width = 5, height = 15,  highlightbackground ="black", command = middleb).grid(row = 0, column = 5, columnspan = 1)
+key7 = Button(boxframe, text = 'C', width = 5, height = 15,  highlightbackground ="black", command = middlec).grid(row = 0, column = 6, columnspan = 1)
+key8 = Button(boxframe, text = 'D', width = 5, height = 15,  highlightbackground ="black", command = middled).grid(row = 0, column = 7, columnspan = 1)
+key9 = Button(boxframe, text = 'E', width = 5, height = 15,  highlightbackground ="black", command = middlee).grid(row = 0, column = 8, columnspan = 1)
+key10 = Button(boxframe, text = 'F', width = 5, height = 15,  highlightbackground ="black", command = middlef).grid(row = 0, column = 9, columnspan = 1)
+key11 = Button(boxframe, text = 'G', width = 5, height = 15,  highlightbackground ="black", command = middleg).grid(row = 0, column = 10, columnspan = 1)
+key12 = Button(boxframe, text = 'A', width = 5, height = 15,  highlightbackground ="black", command = uppera).grid(row = 0, column = 11, columnspan = 1)
+key13 = Button(boxframe, text = 'B', width = 5, height = 15,  highlightbackground ="black", command = upperb).grid(row = 0, column = 12, columnspan = 1)
+key14 = Button(boxframe, text = 'C', width = 5, height = 15,  highlightbackground ="black", command = upperc).grid(row = 0, column = 13, columnspan = 1)
+
+blackkey1 = Button(blackkeyframe, text = 'F#', width = 5, height = 7,  highlightbackground ="black", command = fsharpl).grid(row = 0, column = 0, columnspan = 1, pady = 1) 
+blackkey2 = Button(blackkeyframe, text = 'G#', width = 5, height = 7,  highlightbackground ="black", command = gsharpl).grid(row = 0, column = 2, columnspan = 1)
+blackkey3 = Button(blackkeyframe, text = 'A#', width = 5, height = 7,  highlightbackground ="black", command = asharp).grid(row = 0, column = 4, columnspan = 1)
+blackkey4 = Button(blackkeyframe, text = 'C#', width = 5, height = 7,  highlightbackground ="black", command = csharp).grid(row = 0, column = 6, columnspan = 1)
+blackkey5 = Button(blackkeyframe,text = 'D#', width = 5, height = 7,  highlightbackground ="black", command = dsharp).grid(row = 0, column = 8, columnspan = 1)
+blackkey6 = Button(blackkeyframe, text = 'F#', width = 5, height = 7,  highlightbackground ="black", command =fsharph).grid(row = 0, column = 10, columnspan = 1)
+blackkey7 = Button(blackkeyframe, text = 'G#', width = 5, height = 7,  highlightbackground ="black", command =gsharph).grid(row = 0, column = 12, columnspan = 1)
+                   
+                     
+window.mainloop()

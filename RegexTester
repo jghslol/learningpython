@@ -1,0 +1,30 @@
+from tkinter import *
+
+root=Tk()
+root.title('Regex Testing')
+root.configure(background="navy")
+root.geometry("400x550")
+
+def regexcheck():
+    inputValue=textBox.get("1.0","end-1c")
+    inputValue2=textBox2.get("1.0","end-1c")
+    regexcheck = re.findall(inputValue, inputValue2)
+    if regexcheck != []: 
+        answer = Label(root, bg = 'green', highlightbackground = 'navy', text = 'Matched word', height=2, width=15)
+        answer.pack() 
+        answer.after(1000, answer.destroy)
+    else: 
+        answer = Label(root, bg  = 'red', highlightbackground = 'navy', text = 'Not a match', height=2, width=15)
+        answer.pack() 
+        answer.after(1000, answer.destroy)
+    
+textBox=Text(root, height=2, width=40, highlightbackground = 'navy')
+textBox.pack(pady = 20, ipady=25, padx = 12 )
+
+check_button=Button(root, bg='navy', text='Check', height=2, width=10, highlightbackground= 'navy', command=lambda: regexcheck())
+check_button.pack(padx = 50)
+
+textBox2=Text(root, height=2, width=40, highlightbackground = 'navy')
+textBox2.pack(pady = 40, ipady=100, padx = 7)
+
+mainloop()

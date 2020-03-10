@@ -1,0 +1,59 @@
+    from Tkinter import *
+    from PIL import ImageTk, Image
+    from tkinter import filedialog
+    import pygame
+    from pygame import mixer
+    import numpy as np
+    import pygame
+    import os
+    
+    status = 'unpaused'
+    
+    root = Tk()
+    root.title('Music Player')
+    root.configure(background="orange")
+    root.geometry("210x350")
+    
+    width = 190
+    height= 150
+    
+    win = Canvas(root, 
+               width=width, 
+               height=height, bg = 'black')
+    win.pack()
+    
+    status = 'unpaused'
+    def playmusic(): 
+        global status
+        root.filename = filedialog.askopenfilename(initialdir='/user', title='Select a File', filetypes=(("Mp3 Files", "*.mp3"), ("Mp3 Files", "*.wav") ))
+        a = root.filename
+        selected_file = open(a)
+        mixer.init()
+        mixer.music.load(selected_file)
+        mixer.music.play()
+            
+    def unpause(): 
+        global status
+        mixer.music.unpause()
+        status = 'unpaused'
+     
+    def pausemusic(): 
+        global status
+        mixer.music.pause()
+        status = 'paused'
+    
+    def deal(): 
+        global status
+        if status == 'unpaused': 
+            pausemusic()
+        else: 
+            unpause()
+            
+    def stopmusic(): 
+        mixer.music.pause()
+               
+    playbutton = Button(root, text='Play', command= playmusic, highlightbackground='orange').pack(fill=X, padx = 20, pady = 20)
+    pausebutton = Button(root, text='Pause', command=deal, highlightbackground='orange').pack(fill=X, padx = 20, pady = 20)
+    stopbutton = Button(root, text='Stop', command=stopmusic, highlightbackground='orange').pack(fill=X, padx = 20, pady = 20)
+    
+    root.mainloop()

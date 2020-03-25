@@ -1,0 +1,615 @@
+import random
+import pygame
+
+RED = (255,0,0)
+WHITE= (255,255,255)
+BLACK = (0,0,0)
+GREEN = (5,50,3)
+
+SCREEN_X = 600
+SCREEN_Y= 600 
+X_START = 40 
+Y_START = 40 
+X_END = SCREEN_X - 40 
+Y_END = SCREEN_Y - 40
+PLAYER_GAP = 40
+Y_MIDDLE = (Y_END - Y_START)/2 + Y_START
+X_MIDDLE = (X_END - X_START)/2 + X_START
+
+collected = 0 
+player_eaten = 'no'
+
+class Wall(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height): 
+        super(Wall, self).__init__()
+        self.image = pygame.Surface([width, height])
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+
+class RedBook(pygame.sprite.Sprite): 
+    def __init__(self, x, y, width, height): 
+        super(RedBook, self).__init__()
+        self.image = pygame.Surface([width, height])
+        self.image = pygame.image.load("Book.png").convert_alpha()
+        self.image.set_alpha(0)
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x        
+                
+class Painting(pygame.sprite.Sprite): 
+    def __init__(self, x, y, width, height): 
+        super(Painting, self).__init__()
+        self.image = pygame.Surface([width, height])
+        self.image = pygame.image.load("painting.png").convert_alpha()
+        self.image.set_alpha(0)
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x       
+        
+class Coin(pygame.sprite.Sprite): 
+    def __init__(self, x, y, width, height): 
+        super(Coin, self).__init__()
+        self.image = pygame.Surface([width, height])
+        self.image = pygame.image.load("coin.png").convert_alpha()
+        self.image.set_alpha(0)
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x  
+
+class Rect(pygame.sprite.Sprite): 
+    def __init__(self, x, y, width, height): 
+        super(Rect, self).__init__()
+        self.image = pygame.Surface([width, height])
+        self.image = pygame.image.load("Guard.png").convert_alpha()
+        self.image.set_alpha(0)
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+
+class Player(pygame.sprite.Sprite): 
+    def __init__(self, x, y, width, height):
+        super(Player, self).__init__()
+        self.image = pygame.Surface([width, height])
+        self.image.fill(WHITE)
+        self.image = pygame.image.load("burglar.png").convert_alpha()
+        
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+ 
+        self.change_x = 0
+        self.change_y = 0
+        self.walls = None
+        
+    def changespeed(self, x, y):
+        self.change_x += x
+        self.change_y += y
+ 
+    def update(self):
+        self.rect.x += self.change_x
+ 
+        block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
+        for block in block_hit_list:
+            if self.change_x > 0:
+                self.rect.right = block.rect.left
+            else:
+                self.rect.left = block.rect.right
+     
+        self.rect.y += self.change_y
+        
+        block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
+        for block in block_hit_list:
+ 
+            if self.change_y > 0:
+                self.rect.bottom = block.rect.top
+            else:
+                self.rect.top = block.rect.bottom
+        
+        item_deletion = pygame.sprite.spritecollide(self, self.collect, False)
+        global collected
+        for i in item_deletion: 
+            i.kill()
+            collected += 1
+            
+        badguy_eats = pygame.sprite.spritecollide(self, self.badguy, False)
+        global player_eaten
+        for i in badguy_eats: 
+            self.kill()
+            player_eaten = 'yes'
+               
+pygame.init()
+
+screen = pygame.display.set_mode([SCREEN_X, SCREEN_Y])
+        
+wall_list = pygame.sprite.Group()
+rect_list = pygame.sprite.Group()
+collect_list = pygame.sprite.Group()
+player_list = pygame.sprite.Group()
+
+for i in range(2,12): 
+    wall = Wall(X_START + PLAYER_GAP*i ,Y_MIDDLE + PLAYER_GAP*2,1,PLAYER_GAP*1.5)
+    wall_list.add(wall)
+    
+for i in range(2,7): 
+    wall = Wall(X_START + (PLAYER_GAP *i), Y_START + (PLAYER_GAP *3),1, PLAYER_GAP*1.5)
+    wall_list.add(wall)
+    
+for i in range(7,12): 
+    wall = Wall(X_START + (PLAYER_GAP *i), Y_START + (PLAYER_GAP *3),1, PLAYER_GAP*1.5)
+    wall_list.add(wall)
+
+wall = Wall(X_START, Y_START, X_END - X_START, 1)
+wall_list.add(wall)
+
+wall = Wall(X_START + PLAYER_GAP, Y_START + PLAYER_GAP, X_END - X_START - X_START - PLAYER_GAP, 1)
+wall_list.add(wall)
+
+wall = Wall(X_START + PLAYER_GAP, Y_START + PLAYER_GAP, 1, X_MIDDLE - PLAYER_GAP*4)
+wall_list.add(wall)
+
+wall = Wall(X_END - PLAYER_GAP, Y_START + PLAYER_GAP, 1, X_MIDDLE - PLAYER_GAP*4)
+wall_list.add(wall)
+
+wall = Wall(X_START + (PLAYER_GAP *2), Y_START + (PLAYER_GAP *2), X_END - X_START - X_START - PLAYER_GAP *3, 1)
+wall_list.add(wall)
+
+wall = Wall(X_START + (PLAYER_GAP *2), Y_START + (PLAYER_GAP *3), PLAYER_GAP*9, 1)
+wall_list.add(wall)
+
+wall = Wall(X_START, Y_MIDDLE, X_END - X_START, 1)
+wall_list.add(wall)
+
+wall = Wall(X_MIDDLE, Y_START + PLAYER_GAP, 1, PLAYER_GAP)
+wall_list.add(wall)
+
+wall = Wall(X_MIDDLE - PLAYER_GAP, Y_MIDDLE - PLAYER_GAP, PLAYER_GAP*2, 1)
+wall_list.add(wall)
+
+wall = Wall(X_MIDDLE - PLAYER_GAP, Y_MIDDLE + PLAYER_GAP, PLAYER_GAP*2, 1)
+wall_list.add(wall)
+
+wall = Wall(X_MIDDLE, Y_END - PLAYER_GAP*2, 1, PLAYER_GAP)
+wall_list.add(wall)
+
+wall = Wall(X_END, Y_START, 1, PLAYER_GAP*5.5)
+wall_list.add(wall)
+
+wall = Wall(X_END, Y_MIDDLE + PLAYER_GAP, 1, PLAYER_GAP*5.5)
+wall_list.add(wall)
+
+wall = Wall(X_START, Y_START, 1, PLAYER_GAP*5.5)
+wall_list.add(wall)
+
+wall = Wall(X_START, Y_MIDDLE + PLAYER_GAP, 1, PLAYER_GAP*5.5)
+wall_list.add(wall)
+
+wall = Wall(X_START, Y_MIDDLE - PLAYER_GAP , PLAYER_GAP*4, 1)
+wall_list.add(wall)
+
+wall = Wall(X_START, Y_MIDDLE + PLAYER_GAP , PLAYER_GAP*4, 1)
+wall_list.add(wall)
+
+wall = Wall(X_MIDDLE + PLAYER_GAP*2.5, Y_MIDDLE - PLAYER_GAP , PLAYER_GAP*4, 1)
+wall_list.add(wall)
+
+wall = Wall(X_MIDDLE + PLAYER_GAP*2.5, Y_MIDDLE + PLAYER_GAP , PLAYER_GAP*4, 1)
+wall_list.add(wall)
+
+wall = Wall(X_START + PLAYER_GAP*2 ,Y_END - PLAYER_GAP *2, X_END - X_START - PLAYER_GAP*4,1)
+wall_list.add(wall)
+
+wall = Wall(X_START + PLAYER_GAP*2 ,Y_END - PLAYER_GAP *3, X_END - X_START - PLAYER_GAP*4,1)
+wall_list.add(wall)
+     
+wall = Wall(X_START + PLAYER_GAP ,Y_MIDDLE + PLAYER_GAP*2, 1, Y_END - Y_MIDDLE - PLAYER_GAP*3)
+wall_list.add(wall)
+
+wall = Wall(X_END - PLAYER_GAP ,Y_MIDDLE + PLAYER_GAP*2, 1, Y_END - Y_MIDDLE - PLAYER_GAP*3)
+wall_list.add(wall)
+
+wall = Wall(X_START + PLAYER_GAP ,Y_END - PLAYER_GAP, X_END - X_START - PLAYER_GAP*2,1)
+wall_list.add(wall)
+
+wall = Wall(X_START,Y_END, X_END - X_START,1)
+wall_list.add(wall)
+
+for p1 in range(X_START + PLAYER_GAP*3, Y_END - PLAYER_GAP*3, PLAYER_GAP*2): 
+    painting1 = Painting(p1, Y_MIDDLE - PLAYER_GAP*3,40,40)
+    collect_list.add(painting1)
+    
+for p2 in range(X_START + PLAYER_GAP*3, Y_END - PLAYER_GAP*3, PLAYER_GAP*2): 
+    painting2 = Painting(p2, Y_MIDDLE + PLAYER_GAP*2,40,40)
+    collect_list.add(painting2)
+    
+for b1 in range(X_START, X_END, PLAYER_GAP*2): 
+    for b2 in range (Y_START, Y_MIDDLE - PLAYER_GAP, 80):
+        book1 = RedBook(b1 + 10 , b2 + 10, 40,40)
+        collect_list.add(book1)
+        
+for b3 in range(X_START, X_END, PLAYER_GAP*2): 
+    for b4 in range (Y_MIDDLE + PLAYER_GAP*2, Y_END, 70):
+        book2 = RedBook(b3 + 10 , b4 + 10, 40,40)
+        collect_list.add(book2)
+        
+for c1 in range(X_START + PLAYER_GAP, X_END - PLAYER_GAP, PLAYER_GAP*2): 
+    coin1 = Coin(c1, Y_START + PLAYER_GAP*1.2, 40, 40)
+    collect_list.add(coin1)
+    
+for c2 in range(X_START + PLAYER_GAP, X_END - PLAYER_GAP, PLAYER_GAP*2): 
+    coin2 = Coin(c2, Y_END - PLAYER_GAP*1.8, 40, 40)
+    collect_list.add(coin2)
+    
+coin3 = Coin(X_START + PLAYER_GAP, Y_START + PLAYER_GAP*3, 40, 40)
+collect_list.add(coin3)
+
+coin4 = Coin(X_END - PLAYER_GAP*2, Y_START + PLAYER_GAP*3, 40, 40)
+collect_list.add(coin4)
+
+coin5 = Coin(X_START + PLAYER_GAP, Y_MIDDLE + PLAYER_GAP*3, 40, 40)
+collect_list.add(coin5)
+
+coin6 = Coin(X_END - PLAYER_GAP*2, Y_MIDDLE + PLAYER_GAP*3, 40, 40)
+collect_list.add(coin6)
+          
+bad_guy = Rect(X_START + 10,Y_START,40,40)
+rect_list.add(bad_guy)
+
+bad_guy2 = Rect(X_END - PLAYER_GAP,Y_END - PLAYER_GAP,40,40)
+rect_list.add(bad_guy2)
+
+player = Player(X_MIDDLE, Y_MIDDLE, 40, 40)
+player_list.add(player)
+player.walls = wall_list
+player.collect = collect_list
+player.badguy = rect_list
+
+clock = pygame.time.Clock()   
+
+done = False
+moving = 'right'
+moving2 = 'left'
+timer = 0 
+
+def win_screen():
+    global done
+    pygame.init()
+    screen = pygame.display.set_mode([SCREEN_X, SCREEN_Y])
+    font = pygame.font.SysFont('Arial', 30) 
+    text = font.render('You won!', True, WHITE) 
+    textRect = text.get_rect() 
+    textRect.center = (SCREEN_X // 2, SCREEN_Y // 4) 
+    text_two = font.render('Score: ' + str(timer), True, WHITE) 
+    textRect2 = text.get_rect() 
+    textRect2.center = (SCREEN_X // 2, SCREEN_Y // 2)
+    
+    while not done:
+        for event in pygame.event.get(): 
+            if event.type == pygame.QUIT:
+                done = True
+    
+        clock = pygame.time.Clock()  
+        screen.fill(BLACK)
+        screen.blit(text, textRect)
+        screen.blit(text_two, textRect2) 
+        pygame.display.flip()
+        clock.tick(100)
+
+    pygame.quit() 
+    
+def loose_screen():
+    global done
+    pygame.init()
+    screen = pygame.display.set_mode([SCREEN_X, SCREEN_Y])
+    font = pygame.font.SysFont('Arial', 30) 
+    text = font.render('You lost!', True, WHITE) 
+    textRect = text.get_rect() 
+    textRect.center = (SCREEN_X // 2, SCREEN_Y // 4) 
+
+    while not done:
+        for event in pygame.event.get(): 
+            if event.type == pygame.QUIT:
+                done = True
+    
+        clock = pygame.time.Clock()  
+        screen.fill(BLACK)
+        screen.blit(text, textRect)
+        pygame.display.flip()
+        clock.tick(100)
+
+    pygame.quit() 
+           
+while not done:
+    for event in pygame.event.get():
+        if collected > 65: 
+            win_screen()
+        if player_eaten == 'yes': 
+            loose_screen()
+        
+        if event.type == pygame.QUIT:
+            done = True
+                 
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                player.changespeed(-2, 0)
+            elif event.key == pygame.K_RIGHT:
+                player.changespeed(2, 0)
+            elif event.key == pygame.K_UP:
+                player.changespeed(0, -2)
+            elif event.key == pygame.K_DOWN:
+                player.changespeed(0, 2)
+ 
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                player.changespeed(2, 0)
+            elif event.key == pygame.K_RIGHT:
+                player.changespeed(-2, 0)
+            elif event.key == pygame.K_UP:
+                player.changespeed(0, 2)
+            elif event.key == pygame.K_DOWN:
+                player.changespeed(0, -2)
+    
+    wall_list.update()
+    collect_list.update()
+    rect_list.update()
+    player_list.update()
+    screen.fill(GREEN)
+    wall_list.draw(screen)
+    collect_list.draw(screen)
+    rect_list.draw(screen)
+    player_list.draw(screen)
+     
+    change_direction = random.randint(1,600)
+
+    if change_direction == 2: 
+        if moving == 'left': 
+            moving = 'right'
+            if moving == 'right': 
+                moving = 'right'
+       
+    if moving == 'left': 
+        bad_guy.rect.x -= 1
+    if moving == 'right': 
+        bad_guy.rect.x += 1    
+    if moving == 'up':
+        bad_guy.rect.y -= 1        
+    if moving == 'down':
+        bad_guy.rect.y += 1
+                 
+    if moving == 'right': 
+        if X_END - PLAYER_GAP == bad_guy.rect.x:
+            if bad_guy.rect.y == Y_START: 
+                moving = 'down'
+        
+    if moving == 'down': 
+        if Y_MIDDLE - PLAYER_GAP*2 == bad_guy.rect.y:
+            if X_END - PLAYER_GAP == bad_guy.rect.x: 
+                moving = 'left'
+                
+    if moving == 'left': 
+        if Y_MIDDLE - PLAYER_GAP*2 == bad_guy.rect.y: 
+            if X_START == bad_guy.rect.x:
+                moving = 'up'
+                
+    if moving == 'up': 
+        if X_START == bad_guy.rect.x: 
+            if Y_START == bad_guy.rect.y: 
+                moving = 'right'
+    
+    if moving == 'left': 
+        if bad_guy.rect.x == X_START: 
+            if bad_guy.rect.y == Y_START: 
+                moving = 'down'
+                
+    if moving == 'down': 
+        if X_START == bad_guy.rect.x:
+            if Y_MIDDLE - PLAYER_GAP*2 == bad_guy.rect.y: 
+                moving = 'right'
+    
+    if moving == 'right': 
+        if X_END - PLAYER_GAP == bad_guy.rect.x:
+            if bad_guy.rect.y == Y_MIDDLE - PLAYER_GAP*2: 
+                moving = 'up'
+    
+    if moving == 'up': 
+        if X_END - PLAYER_GAP == bad_guy.rect.x: 
+            if bad_guy.rect.y == Y_START:
+                moving = 'left'
+                                
+    r = random.randint(1,3)
+    if r == 2: 
+        if moving == 'left': 
+            for i in range(1,12): 
+                if Y_MIDDLE - PLAYER_GAP*2 == bad_guy.rect.y:
+                    if bad_guy.rect.x == X_START + PLAYER_GAP*i: 
+                        moving = 'up'             
+          
+    if moving == 'up':
+        if Y_START + PLAYER_GAP == bad_guy.rect.y:
+            if X_END - PLAYER_GAP*2 == bad_guy.rect.x:
+                moving = 'left'
+    
+    if moving == 'left': 
+        if X_MIDDLE == bad_guy.rect.x: 
+            if Y_START + PLAYER_GAP == bad_guy.rect.y: 
+                moving = 'right'
+       
+    if moving == 'right': 
+        if X_END - PLAYER_GAP*2 == bad_guy.rect.x: 
+            if Y_START + PLAYER_GAP == bad_guy.rect.y: 
+                moving = 'down'
+       
+    var = random.randint(1,3)
+    if var == 2: 
+        if moving == 'up': 
+            if X_END - PLAYER_GAP*2 == bad_guy.rect.x: 
+                if Y_START + PLAYER_GAP*2 == bad_guy.rect.y: 
+                    moving = 'left'
+        
+    if moving == 'left': 
+        if Y_START + PLAYER_GAP*2 == bad_guy.rect.y: 
+            if X_START + PLAYER_GAP == bad_guy.rect.x: 
+                moving = 'down'
+                
+    if moving == 'right':
+        if X_END - PLAYER_GAP*2 == bad_guy.rect.x: 
+            if Y_START + PLAYER_GAP*2 == bad_guy.rect.y: 
+                moving = 'down'
+
+    if moving == 'down': 
+        if bad_guy.rect.x > X_START and bad_guy.rect.x < X_END - PLAYER_GAP: 
+            if Y_MIDDLE - PLAYER_GAP*2 == bad_guy.rect.y: 
+                moving = 'left'
+                
+    if moving == 'up': 
+        if bad_guy.rect.y == Y_START + PLAYER_GAP*3: 
+            if bad_guy.rect.x != X_START:
+                if bad_guy.rect.x != X_END - PLAYER_GAP*2:
+                    if bad_guy.rect.x != X_START + PLAYER_GAP:
+                        moving = 'down'
+    
+    if moving == 'up':
+        if Y_START + PLAYER_GAP == bad_guy.rect.y: 
+            if X_START + PLAYER_GAP == bad_guy.rect.x: 
+                moving = 'right'
+    
+    if moving == 'right': 
+        if X_MIDDLE - PLAYER_GAP == bad_guy.rect.x: 
+            if Y_START + PLAYER_GAP == bad_guy.rect.y: 
+                moving = 'left'
+
+    if moving == 'left': 
+        if Y_START + PLAYER_GAP == bad_guy.rect.y: 
+            if X_START + PLAYER_GAP == bad_guy.rect.x: 
+                moving = 'down'
+                       
+    if moving2 == 'left': 
+       bad_guy2.rect.x -= 1    
+    if moving2 == 'right': 
+       bad_guy2.rect.x += 1    
+    if moving2 == 'up':
+       bad_guy2.rect.y -= 1        
+    if moving2 == 'down':
+       bad_guy2.rect.y += 1
+           
+    if moving2 == 'left': 
+        if X_START == bad_guy2.rect.x: 
+            if Y_END - PLAYER_GAP == bad_guy2.rect.y:
+                moving2 = 'up'
+            
+    if moving2 == 'up': 
+        if Y_MIDDLE + PLAYER_GAP == bad_guy2.rect.y: 
+            if X_START == bad_guy2.rect.x: 
+                moving2 = 'right'
+                
+    if moving2 == 'right':
+        if Y_MIDDLE + PLAYER_GAP == bad_guy2.rect.y:
+            if X_END - PLAYER_GAP == bad_guy2.rect.x: 
+                moving2 = 'down'
+    
+    if moving2 == 'down': 
+        if X_END - PLAYER_GAP == bad_guy2.rect.x: 
+            if Y_END - PLAYER_GAP == bad_guy2.rect.y: 
+                moving2 = 'left'
+    
+    change_direction2 = random.randint(1,600)
+
+    if change_direction2 == 2: 
+        if moving2 == 'left': 
+            moving2 = 'right'
+            if moving2 == 'right': 
+                moving2 = 'right'
+                            
+    if moving2 == 'right': 
+        if X_END - PLAYER_GAP == bad_guy2.rect.x: 
+            if Y_END - PLAYER_GAP == bad_guy2.rect.y:
+                moving2 = 'up'
+                
+    if moving2 == 'up': 
+        if Y_MIDDLE + PLAYER_GAP == bad_guy2.rect.y:
+            if X_END - PLAYER_GAP == bad_guy2.rect.x:
+                moving2 = 'left'
+                
+    if moving2 == 'left': 
+        if Y_MIDDLE + PLAYER_GAP == bad_guy2.rect.y: 
+            if X_START == bad_guy2.rect.x: 
+                moving2 = 'down'
+                
+    if moving2 == 'down': 
+        if X_START == bad_guy2.rect.x: 
+            if Y_END - PLAYER_GAP == bad_guy2.rect.y:
+                moving2 = 'right'
+    
+    y = random.randint(1,2)
+    if y == 2: 
+        if moving2 == 'right':
+            if Y_MIDDLE + PLAYER_GAP == bad_guy2.rect.y:
+                for i in range(1,12):
+                    if bad_guy2.rect.x == X_START + PLAYER_GAP*i:
+                        moving2 = 'down'
+           
+    if moving2 == 'down':                    
+        if bad_guy2.rect.y == Y_MIDDLE + PLAYER_GAP*2.5:
+            if bad_guy2.rect.x < X_END - PLAYER_GAP*2: 
+                if bad_guy2.rect.x > X_START + PLAYER_GAP:
+                    moving2 = 'up'
+    
+    if moving2 == 'up': 
+        if Y_MIDDLE + PLAYER_GAP == bad_guy2.rect.y:
+            for i in range(1,12):
+                if bad_guy2.rect.x == X_START + PLAYER_GAP*i:
+                    moving2 = 'right'
+    
+    if moving2 == 'down': 
+        if Y_END - PLAYER_GAP*2 == bad_guy2.rect.y: 
+            if X_START + PLAYER_GAP == bad_guy2.rect.x:
+                moving2 = 'right'
+            
+    if moving2 == 'right': 
+        if X_MIDDLE - PLAYER_GAP == bad_guy2.rect.x: 
+            if Y_END - PLAYER_GAP*2 == bad_guy2.rect.y: 
+                moving2 = 'left'
+                
+    if moving2 == 'left': 
+        if Y_END - PLAYER_GAP*2 == bad_guy2.rect.y: 
+            if X_START + PLAYER_GAP == bad_guy2.rect.x:
+                moving2 = 'up'
+        
+    if moving2 == 'left': 
+        if Y_END - PLAYER_GAP*3 == bad_guy2.rect.y: 
+            if X_START + PLAYER_GAP == bad_guy2.rect.x: 
+                moving2 = 'up'
+        
+    if moving2 == 'down': 
+        if Y_END - PLAYER_GAP*2 == bad_guy2.rect.y:
+            if X_END - PLAYER_GAP*2 == bad_guy2.rect.x: 
+                moving2 = 'left'
+                
+    if moving2 == 'left': 
+        if X_MIDDLE == bad_guy2.rect.x: 
+            if Y_END - PLAYER_GAP*2 == bad_guy2.rect.y: 
+                moving2 = 'right'      
+     
+    if moving2 == 'right': 
+        if X_END - PLAYER_GAP*2 == bad_guy2.rect.x: 
+            if Y_END - PLAYER_GAP*2 == bad_guy2.rect.y: 
+                moving2 = 'up'
+            
+    var2 = random.randint(1,3)
+    var2 = 2
+    if var2 == 2: 
+        if Y_END - PLAYER_GAP*3 == bad_guy2.rect.y: 
+            if X_START + PLAYER_GAP == bad_guy2.rect.x:
+                moving2 = 'right'
+    
+    if moving2 == 'right':
+        if Y_END - PLAYER_GAP*3 == bad_guy2.rect.y: 
+            if X_END - PLAYER_GAP*2 == bad_guy2.rect.x: 
+                moving2 = 'up'
+                         
+    pygame.display.flip()
+    timer += 1      
+    clock.tick(240)
+        
+pygame.quit()    

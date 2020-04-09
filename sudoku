@@ -1,0 +1,1242 @@
+import random
+import pygame
+
+DARK = (205, 205, 205)
+LIGHT = (233, 233, 233)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+SCREEN_X = 600
+SCREEN_Y = 600
+
+X_START = 0
+Y_START = 0
+X_END = 600
+Y_END = 600
+BOX_SIZE = 66.66
+BOX_CENTER = BOX_SIZE / 2
+
+def intro_screen():
+    pygame.init()
+
+    screen = pygame.display.set_mode([SCREEN_X, SCREEN_Y])
+    pygame.display.set_caption('Sudoku')
+    font = pygame.font.SysFont('Arial', 25)
+
+    firstscreen = False
+
+    while not firstscreen:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                firstscreen = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    firstscreen = True
+
+        clock = pygame.time.Clock()
+        screen.fill(BLACK)
+
+        screen.blit(font.render('HOW TO PLAY', True, LIGHT), (X_START + BOX_SIZE * 3.5, Y_START + BOX_SIZE))
+
+        screen.blit(font.render('Fill out each row and column', True, LIGHT),
+                    (X_START + BOX_SIZE * 2.6, Y_START + BOX_SIZE * 1.5))
+        screen.blit(font.render('(9 spaces each) with the numbers 1-9', True, LIGHT),
+                    (X_START + BOX_SIZE * 2.15, Y_START + BOX_SIZE * 2))
+        screen.blit(font.render('without repeating any numbers', True, LIGHT),
+                    (X_START + BOX_SIZE * 2.4, Y_START + BOX_SIZE * 2.5))
+        screen.blit(font.render('within the row, column or square.', True, LIGHT),
+                    (X_START + BOX_SIZE * 2.35, Y_START + BOX_SIZE * 3))
+
+        screen.blit(font.render('To enter a number', True, LIGHT), (X_START + BOX_SIZE * 3.3, Y_START + BOX_SIZE * 4))
+        screen.blit(font.render('Hover over the relevant square with the mouse', True, LIGHT),
+                    (X_START + BOX_SIZE * 1.6, Y_START + BOX_SIZE * 4.5))
+        screen.blit(font.render('Input the number with the keypad', True, LIGHT),
+                    (X_START + BOX_SIZE * 2.4, Y_START + BOX_SIZE * 5))
+        screen.blit(font.render('To delete a number, press 0', True, LIGHT),
+                    (X_START + BOX_SIZE * 2.65, Y_START + BOX_SIZE * 5.5))
+        screen.blit(font.render('The game will tell you when you\'ve won', True, LIGHT),
+                    (X_START + BOX_SIZE * 2, Y_START + BOX_SIZE * 6))
+        screen.blit(font.render('Key escape for the solution', True, LIGHT),
+                    (X_START + BOX_SIZE * 2.75, Y_START + BOX_SIZE * 6.5))
+        screen.blit(font.render('Press return to continue', True, LIGHT),
+                    (X_START + BOX_SIZE * 2.9, Y_START + BOX_SIZE * 7))
+
+        pygame.display.update()
+        pygame.display.flip()
+        clock.tick(100)
+
+
+intro_screen()
+
+def win_screen():
+    pygame.init()
+
+    screen = pygame.display.set_mode([SCREEN_X, SCREEN_Y])
+    pygame.display.set_caption('Sudoku')
+    font = pygame.font.SysFont('Arial', 25)
+
+    winscreen = False
+
+    while not winscreen:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                winscreen = True
+
+        clock = pygame.time.Clock()
+        screen.fill(BLACK)
+
+        screen.blit(font.render('Winner!', True, LIGHT), (X_START + BOX_SIZE * 4, Y_START + BOX_SIZE * 2))
+
+        pygame.display.update()
+        pygame.display.flip()
+        clock.tick(100)
+
+    pygame.quit()
+
+a = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+board = []
+new_board = []
+
+for i in range(81):
+    board.append(0)
+
+for i in range(81):
+    new_board.append(0)
+
+r = random.sample(a, 9)
+
+for i in range(0, 3):
+    board[i] = r[i]
+    board[i + 3 * 4] = r[i]
+    board[i + 3 * 8] = r[i]
+
+for i in range(3, 6):
+    board[i + 3] = r[i]
+    board[i + 3 * 2] = r[i]
+    board[i + 3 * 6] = r[i]
+
+for i in range(6, 9):
+    board[i - 3] = r[i]
+    board[i + 3 * 3] = r[i]
+    board[i + 3 * 4] = r[i]
+
+board[(9 * 3)] = board[1]
+board[(9 * 4)] = board[1 + 9]
+board[(9 * 5)] = board[1 + 9 * 2]
+
+board[(9 * 6) + 1] = board[0]
+board[(9 * 7) + 1] = board[0 + 9]
+board[(9 * 8) + 1] = board[0 + 9 * 2]
+
+board[(9 * 3) + 2] = board[0]
+board[(9 * 4) + 2] = board[0 + 9]
+board[(9 * 5) + 2] = board[0 + 9 * 2]
+
+board[(9 * 6)] = board[2]
+board[(9 * 7)] = board[2 + 9]
+board[(9 * 8)] = board[2 + 9 * 2]
+
+board[(9 * 3) + 1] = board[2]
+board[(9 * 4) + 1] = board[2 + 9]
+board[(9 * 5) + 1] = board[2 + 9 * 2]
+
+board[(9 * 6) + 2] = board[1]
+board[(9 * 7) + 2] = board[1 + 9]
+board[(9 * 8) + 2] = board[1 + 9 * 2]
+
+for i in range(0, 3):
+    board[i + (9 * 4) + 3] = board[i + (9 * 3)]
+    board[i + (9 * 5) + (3 * 2)] = board[i + (9 * 3)]
+
+    board[i + (9 * 5) + 3] = board[i + (9 * 4)]
+    board[i + (9 * 3) + (3 * 2)] = board[i + (9 * 4)]
+
+    board[i + (9 * 3) + 3] = board[i + (9 * 5)]
+    board[i + (9 * 4) + (3 * 2)] = board[i + (9 * 5)]
+
+    board[i + (9 * 7) + 3] = board[i + (9 * 6)]
+    board[i + (9 * 8) + (3 * 2)] = board[i + (9 * 6)]
+
+    board[i + (9 * 8) + 3] = board[i + (9 * 7)]
+    board[i + (9 * 6) + (3 * 2)] = board[i + (9 * 7)]
+
+    board[i + (9 * 6) + (3)] = board[i + (9 * 8)]
+    board[i + (9 * 7) + (3 * 2)] = board[i + (9 * 8)]
+
+a = board[0]
+b = board[(9 * 2)]
+
+board[0] = b
+board[(9 * 2)] = a
+
+c = board[3]
+d = board[9 * 2 + 3]
+
+board[3] = d
+board[9 * 2 + 3] = c
+
+e = board[6]
+f = board[9 * 2 + 6]
+
+board[6] = f
+board[9 * 2 + 6] = e
+
+m = board[9 * 3]
+n = board[9 * 5]
+
+board[9 * 5] = m
+board[9 * 3] = n
+
+o = board[9 * 3 + 3]
+p = board[9 * 5 + 3]
+
+board[9 * 3 + 3] = p
+board[9 * 5 + 3] = o
+
+q = board[9 * 3 + 6]
+r = board[9 * 5 + 6]
+
+board[9 * 3 + 6] = r
+board[9 * 5 + 6] = q
+
+s = board[9 * 6]
+t = board[9 * 8]
+
+board[9 * 6] = t
+board[9 * 8] = s
+
+u = board[9 * 6 + 3]
+v = board[9 * 8 + 3]
+
+board[9 * 6 + 3] = v
+board[9 * 8 + 3] = u
+
+w = board[9 * 6 + 6]
+x = board[9 * 8 + 6]
+
+board[9 * 6 + 6] = x
+board[9 * 8 + 6] = w
+
+a1 = board[0 + 2]
+b1 = board[(9 * 2) + 2]
+
+board[0 + 2] = b1
+board[(9 * 2) + 2] = a1
+
+c1 = board[3 + 2]
+d1 = board[9 * 2 + 5]
+
+board[3 + 2] = d1
+board[9 * 2 + 5] = c1
+
+e1 = board[6 + 2]
+f1 = board[9 * 2 + 8]
+
+board[6 + 2] = f1
+board[9 * 2 + 6 + 2] = e1
+
+m1 = board[9 * 3 + 2]
+n1 = board[9 * 5 + 2]
+
+board[9 * 5 + 2] = m1
+board[9 * 3 + 2] = n1
+
+o1 = board[9 * 3 + 5]
+p1 = board[9 * 5 + 5]
+
+board[9 * 3 + 5] = p1
+board[9 * 5 + 5] = o1
+
+q1 = board[9 * 3 + 8]
+r1 = board[9 * 5 + 8]
+
+board[9 * 3 + 8] = r1
+board[9 * 5 + 8] = q1
+
+s1 = board[9 * 6 + 2]
+t1 = board[9 * 8 + 2]
+
+board[9 * 6 + 2] = t1
+board[9 * 8 + 2] = s1
+
+u1 = board[9 * 6 + 5]
+v1 = board[9 * 8 + 5]
+
+board[9 * 6 + 5] = v1
+board[9 * 8 + 5] = u1
+
+w1 = board[9 * 6 + 8]
+x1 = board[9 * 8 + 8]
+
+board[9 * 6 + 8] = x1
+board[9 * 8 + 8] = w1
+
+mm1 = board[9]
+mm2 = board[9 + 2]
+
+board[9] = mm2
+board[9 + 2] = mm1
+
+mm3 = board[9 + 3]
+mm4 = board[9 + 5]
+
+board[9 + 3] = mm4
+board[9 + 5] = mm3
+
+mm5 = board[9 + 6]
+mm6 = board[9 + 8]
+
+board[9 + 6] = mm6
+board[9 + 8] = mm5
+
+mm7 = board[9 * 4]
+mm8 = board[9 * 4 + 2]
+
+board[9 * 4] = mm8
+board[9 * 4 + 2] = mm7
+
+mm9 = board[9 * 4 + 3]
+mm10 = board[9 * 4 + 5]
+
+board[9 * 4 + 3] = mm10
+board[9 * 4 + 5] = mm9
+
+mm11 = board[9 * 4 + 6]
+mm12 = board[9 * 4 + 8]
+
+board[9 * 4 + 6] = mm12
+board[9 * 4 + 8] = mm11
+
+mm13 = board[9 * 7]
+mm14 = board[9 * 7 + 2]
+
+board[9 * 7] = mm14
+board[9 * 7 + 2] = mm13
+
+mm15 = board[9 * 7 + 3]
+mm16 = board[9 * 7 + 5]
+
+board[9 * 7 + 3] = mm16
+board[9 * 7 + 5] = mm15
+
+mm17 = board[9 * 7 + 6]
+mm18 = board[9 * 7 + 8]
+
+board[9 * 7 + 6] = mm18
+board[9 * 7 + 8] = mm17
+
+def loose_screen():
+    screen = pygame.display.set_mode([SCREEN_X, SCREEN_Y])
+    pygame.display.set_caption('Sudoku')
+    font = pygame.font.SysFont('Arial', 25)
+    font2 = pygame.font.SysFont('Arial', 12)
+
+    finalscreen = False
+
+    while not finalscreen:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finalscreen = True
+
+        clock = pygame.time.Clock()
+        screen.fill(BLACK)
+
+        screen.blit(font.render('Solution', True, LIGHT), (X_START + BOX_SIZE * 4, Y_START + BOX_SIZE * 2))
+
+        for i in range(0, 10):
+            pygame.draw.line(screen, LIGHT, (X_START + BOX_SIZE * 3, Y_START + (BOX_SIZE * 3) + (BOX_SIZE * i / 3)),
+                             (X_END - BOX_SIZE * 3, Y_START + (BOX_SIZE * 3) + (BOX_SIZE * i / 3)))
+            pygame.draw.line(screen, LIGHT, (X_START + (BOX_SIZE * 3) + BOX_SIZE * i / 3, Y_START + (BOX_SIZE * 3)),
+                             (X_START + (BOX_SIZE * 3) + BOX_SIZE * i / 3, Y_END - (BOX_SIZE * 3)))
+
+        for i in range(3, 7, 3):
+            pygame.draw.line(screen, LIGHT, (X_START + (BOX_SIZE * 3) + (BOX_SIZE * i / 3), Y_START + (BOX_SIZE * 3)),
+                             (X_START + (BOX_SIZE * i / 3) + (BOX_SIZE * 3), Y_END - BOX_SIZE * 3), 3)
+            pygame.draw.line(screen, LIGHT, (X_START + (BOX_SIZE * 3), Y_START + (BOX_SIZE * 3) + (BOX_SIZE * i / 3)),
+                             (X_END - BOX_SIZE * 3, Y_START + (BOX_SIZE * 3) + (BOX_SIZE * i / 3)), 3)
+
+        pygame.draw.line(screen, LIGHT, (X_START + BOX_SIZE * 3, Y_START + BOX_SIZE * 3),
+                         (X_END - BOX_SIZE * 3, Y_START + BOX_SIZE * 3), 3)
+        pygame.draw.line(screen, LIGHT, (X_START + BOX_SIZE * 3, Y_END - BOX_SIZE * 3),
+                         (X_END - BOX_SIZE * 3, Y_END - BOX_SIZE * 3), 3)
+        pygame.draw.line(screen, LIGHT, (X_START + BOX_SIZE * 3, Y_START + BOX_SIZE * 3),
+                         (X_START + BOX_SIZE * 3, Y_END - BOX_SIZE * 3), 3)
+        pygame.draw.line(screen, LIGHT, (X_END - BOX_SIZE * 3, Y_START + BOX_SIZE * 3),
+                         (X_END - BOX_SIZE * 3, Y_END - BOX_SIZE * 3), 3)
+
+        for i in range(0, 9):
+            screen.blit(font2.render(str(finalboard[i]), True, LIGHT), (
+            (X_START / 3 + BOX_CENTER / 3 + BOX_SIZE * 3 + BOX_SIZE * i / 3),
+            (Y_START / 3 + BOX_CENTER / 3 + BOX_SIZE * 3)))
+
+        for i in range(9, 18):
+            screen.blit(font2.render(str(finalboard[i]), True, LIGHT), (
+            X_START / 3 + BOX_CENTER / 3 + BOX_SIZE * (i - 9) / 3 + BOX_SIZE * 3,
+            Y_START / 3 + BOX_CENTER / 3 + BOX_SIZE / 3 + BOX_SIZE * 3))
+
+        for i in range(18, 27):
+            screen.blit(font2.render(str(finalboard[i]), True, LIGHT), (
+            X_START / 3 + BOX_CENTER / 3 + BOX_SIZE * (i - 18) / 3 + BOX_SIZE * 3,
+            Y_START / 3 + BOX_CENTER / 3 + BOX_SIZE * 2 / 3 + BOX_SIZE * 3))
+
+        for i in range(27, 36):
+            screen.blit(font2.render(str(finalboard[i]), True, LIGHT),
+                        (X_START / 3 + BOX_CENTER / 3 + BOX_SIZE * (i - 27) / 3 + BOX_SIZE * 3,
+                         Y_START / 3 + BOX_CENTER / 3 + BOX_SIZE * 3 / 3 + BOX_SIZE * 3))
+
+        for i in range(36, 45):
+            screen.blit(font2.render(str(finalboard[i]), True, LIGHT),
+                        (X_START / 3 + BOX_CENTER / 3 + BOX_SIZE * (i - 36) / 3 + BOX_SIZE * 3,
+                         Y_START / 3 + BOX_CENTER / 3 + BOX_SIZE * 4 / 3 + BOX_SIZE * 3))
+
+        for i in range(45, 54):
+            screen.blit(font2.render(str(finalboard[i]), True, LIGHT),
+                        (X_START / 3 + BOX_CENTER / 3 + BOX_SIZE * (i - 45) / 3 + BOX_SIZE * 3,
+                         Y_START / 3 + BOX_CENTER / 3 + BOX_SIZE * 5 / 3 + BOX_SIZE * 3))
+
+        for i in range(54, 63):
+            screen.blit(font2.render(str(finalboard[i]), True, LIGHT),
+                        (X_START / 3 + BOX_CENTER / 3 + BOX_SIZE * (i - 54) / 3 + BOX_SIZE * 3,
+                         Y_START / 3 + BOX_CENTER / 3 + BOX_SIZE * 6 / 3 + BOX_SIZE * 3))
+
+        for i in range(63, 72):
+            screen.blit(font2.render(str(finalboard[i]), True, LIGHT), (
+            X_START / 3 + BOX_CENTER / 3 + BOX_SIZE * (i - 63) / 3 + BOX_SIZE * 3,
+            Y_START / 3 + BOX_CENTER / 3 + BOX_SIZE * 7 / 3 + BOX_SIZE * 3))
+
+        for i in range(72, 81):
+            screen.blit(font2.render(str(finalboard[i]), True, LIGHT), (
+            X_START / 3 + BOX_CENTER / 3 + BOX_SIZE * (i - 72) / 3 + BOX_SIZE * 3,
+            Y_START / 3 + BOX_CENTER / 3 + BOX_SIZE * 8 / 3 + BOX_SIZE * 3))
+
+        pygame.display.update()
+        pygame.display.flip()
+        clock.tick(100)
+
+    pygame.quit()
+
+pygame.init()
+
+pos = (100, 100)
+screen = pygame.display.set_mode([SCREEN_X, SCREEN_Y])
+pygame.display.set_caption('Sudoku')
+font = pygame.font.SysFont('Arial', 25)
+number = random.randint(1, 10)
+
+num_list = []
+
+for i in range(81):
+    num_list.append(i)
+
+select = random.sample(num_list, 31)
+
+for i in select:
+    new_board[i] = board[i]
+
+not_select = []
+
+square1 = []
+square2 = []
+square3 = []
+square4 = []
+square5 = []
+square6 = []
+square7 = []
+square8 = []
+square9 = []
+square10 = []
+square11 = []
+square12 = []
+square13 = []
+square14 = []
+square15 = []
+square16 = []
+square17 = []
+square18 = []
+square19 = []
+square20 = []
+square21 = []
+square22 = []
+square23 = []
+square24 = []
+square25 = []
+square26 = []
+square27 = []
+square28 = []
+square29 = []
+square30 = []
+square31 = []
+square32 = []
+square33 = []
+square34 = []
+square35 = []
+square36 = []
+square37 = []
+square38 = []
+square39 = []
+square40 = []
+square41 = []
+square42 = []
+square43 = []
+square44 = []
+square45 = []
+square46 = []
+square47 = []
+square48 = []
+square49 = []
+square50 = []
+square51 = []
+square52 = []
+square53 = []
+square54 = []
+square55 = []
+square56 = []
+square57 = []
+square58 = []
+square59 = []
+square60 = []
+square61 = []
+square62 = []
+square63 = []
+square64 = []
+square65 = []
+square66 = []
+square67 = []
+square68 = []
+square69 = []
+square70 = []
+square71 = []
+square72 = []
+square73 = []
+square74 = []
+square75 = []
+square76 = []
+square77 = []
+square78 = []
+square79 = []
+square80 = []
+square81 = []
+
+for i in range(81):
+    if i not in select:
+        not_select.append(i)
+
+def get_pressed(number):
+    if event.type == pygame.KEYDOWN:
+        press = pygame.key.get_pressed()
+        if press[pygame.K_1]:
+            number.append(1)
+        elif press[pygame.K_2]:
+            number.append(2)
+        elif press[pygame.K_3]:
+            number.append(3)
+        elif press[pygame.K_4]:
+            number.append(4)
+        elif press[pygame.K_5]:
+            number.append(5)
+        elif press[pygame.K_6]:
+            number.append(6)
+        elif press[pygame.K_7]:
+            number.append(7)
+        elif press[pygame.K_8]:
+            number.append(8)
+        elif press[pygame.K_9]:
+            number.append(9)
+        elif press[pygame.K_0]:
+            number.append('')
+
+done = False
+
+x1 = []
+ys = []
+
+for i in range(X_START, X_END, int(BOX_SIZE)):
+    x1.append(i)
+
+for i in range(Y_START, Y_END, int(BOX_SIZE)):
+    ys.append(i)
+
+
+while not done:
+    events = pygame.event.get()
+    for event in events:
+        if event.type == pygame.QUIT:
+            done = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                loose_screen()
+
+
+    clock = pygame.time.Clock()
+    screen.fill(WHITE)
+
+
+    for i in range(0,9,2):
+        screen.fill((DARK), rect=(X_START + BOX_SIZE*i,Y_START,X_START + BOX_SIZE,Y_START+ BOX_SIZE))
+        screen.fill((LIGHT), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((DARK), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE * 2, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((LIGHT), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE * 3, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((DARK), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE * 4, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((LIGHT), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE * 5, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((DARK), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE * 6, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((LIGHT), rect=(X_START + BOX_SIZE*i,Y_START + BOX_SIZE*7, X_START + BOX_SIZE,Y_START+ BOX_SIZE))
+        screen.fill((DARK), rect=(X_START + BOX_SIZE*i,Y_START + BOX_SIZE*8, X_START + BOX_SIZE,Y_START+ BOX_SIZE))
+
+
+    for i in range(1,8,2):
+        screen.fill((LIGHT), rect=(X_START + BOX_SIZE*i,Y_START,X_START + BOX_SIZE,Y_START+ BOX_SIZE))
+        screen.fill((DARK), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((LIGHT), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE * 2, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((DARK), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE * 3, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((LIGHT), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE * 4, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((DARK), rect=(X_START + BOX_SIZE * i, Y_START + BOX_SIZE * 5, X_START + BOX_SIZE, Y_START + BOX_SIZE))
+        screen.fill((LIGHT), rect=(X_START + BOX_SIZE*i,Y_START + BOX_SIZE*6, X_START + BOX_SIZE,Y_START+ BOX_SIZE))
+        screen.fill((DARK), rect=(X_START + BOX_SIZE*i,Y_START + BOX_SIZE*7, X_START + BOX_SIZE,Y_START+ BOX_SIZE))
+        screen.fill((LIGHT), rect=(X_START + BOX_SIZE*i,Y_START + BOX_SIZE*8, X_START + BOX_SIZE,Y_START+ BOX_SIZE))
+
+
+    # the full grid
+    for i in range(0, 10):
+        pygame.draw.line(screen, BLACK, (X_START, Y_START + BOX_SIZE * i), (X_END, Y_START + BOX_SIZE * i), 2)
+        pygame.draw.line(screen, BLACK, (X_START + BOX_SIZE * i, Y_START), (X_START + BOX_SIZE * i, Y_END), 2)
+
+    # the thick grid lines
+    for i in range(3, 7, 3):
+        pygame.draw.line(screen, BLACK, (X_START + BOX_SIZE * i, Y_START), (X_START + BOX_SIZE * i, Y_END), 3)
+        pygame.draw.line(screen, BLACK, (X_START, Y_START + BOX_SIZE * i), (X_END, Y_START + BOX_SIZE * i), 3)
+
+    # displaying each line
+    for i in range(9):
+        if i in select:
+            screen.blit(font.render(str(board[i]), True, BLACK),
+                        (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER))
+
+    for i in range(9, 18):
+        if i in select:
+            screen.blit(font.render(str(board[i]), True, BLACK),
+                        (X_START + BOX_CENTER + BOX_SIZE * (i - 9), Y_START + BOX_CENTER + BOX_SIZE))
+
+    for i in range(18, 27):
+        if i in select:
+            screen.blit(font.render(str(board[i]), True, BLACK),
+                        (X_START + BOX_CENTER + BOX_SIZE * (i - 18), Y_START + BOX_CENTER + BOX_SIZE * 2))
+
+    for i in range(27, 36):
+        if i in select:
+            screen.blit(font.render(str(board[i]), True, BLACK),
+                        (X_START + BOX_CENTER + BOX_SIZE * (i - 27), Y_START + BOX_CENTER + BOX_SIZE * 3))
+
+    for i in range(36, 45):
+        if i in select:
+            screen.blit(font.render(str(board[i]), True, BLACK),
+                        (X_START + BOX_CENTER + BOX_SIZE * (i - 36), Y_START + BOX_CENTER + BOX_SIZE * 4))
+
+    for i in range(45, 54):
+        if i in select:
+            screen.blit(font.render(str(board[i]), True, BLACK),
+                        (X_START + BOX_CENTER + BOX_SIZE * (i - 45), Y_START + BOX_CENTER + BOX_SIZE * 5))
+
+    for i in range(54, 63):
+        if i in select:
+            screen.blit(font.render(str(board[i]), True, BLACK),
+                        (X_START + BOX_CENTER + BOX_SIZE * (i - 54), Y_START + BOX_CENTER + BOX_SIZE * 6))
+
+    for i in range(63, 72):
+        if i in select:
+            screen.blit(font.render(str(board[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * (i - 63), Y_START + BOX_CENTER + BOX_SIZE * 7))
+
+    for i in range(72, 81):
+        if i in select:
+            screen.blit(font.render(str(board[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * (i - 72), Y_START + BOX_CENTER + BOX_SIZE * 8))
+
+    pos = pygame.mouse.get_pos()
+
+    numberslist = [square1, square2, square3, square4, square5, square6, square7, square8, square9]
+    numberslist2 = [square10, square11, square12, square13, square14, square15, square16, square17, square18]
+    numberslist3 = [square19, square20, square21, square22, square23, square24, square25, square26, square27]
+    numberslist4 = [square28, square29, square30, square31, square32, square33, square34, square35, square36]
+    numberslist5 = [square37, square38, square39, square40, square41, square42, square43, square44, square45]
+    numberslist6 = [square46, square47, square48, square49, square50, square51, square52, square53, square54]
+    numberslist7 = [square55, square56, square57, square58, square59, square60, square61, square62, square63]
+    numberslist8 = [square64, square65, square66, square67, square68, square69, square70, square71, square72]
+    numberslist9 = [square73, square74, square75, square76, square77, square78, square79, square80, square81]
+
+    for i in range(9):
+        if x1[i] < pos[0] < x1[i+1] and ys[0] < pos[1] < ys[1] and i in not_select:
+            get_pressed(numberslist[i])
+
+    for i in range(9,18):
+        if x1[i-9] < pos[0] < x1[i-8] and ys[1] < pos[1] < ys[2] and i in not_select:
+            get_pressed(numberslist2[i-9])
+
+    for i in range(18,27):
+        if x1[i-18] < pos[0] < x1[i-17] and ys[2] < pos[1] < ys[3] and i in not_select:
+            get_pressed(numberslist3[i-18])
+
+    for i in range(27,36):
+        if x1[i-27] < pos[0] < x1[i-26] and ys[3] < pos[1] < ys[4] and i in not_select:
+            get_pressed(numberslist4[i-27])
+
+    for i in range(36,45):
+        if x1[i-36] < pos[0] < x1[i-35] and ys[4] < pos[1] < ys[5] and i in not_select:
+            get_pressed(numberslist5[i-36])
+
+    for i in range(45,54):
+        if x1[i-45] < pos[0] < x1[i-44] and ys[5] < pos[1] < ys[6] and i in not_select:
+            get_pressed(numberslist6[i-45])
+
+    for i in range(54,63):
+        if x1[i-54] < pos[0] < x1[i-53] and ys[6] < pos[1] < ys[7] and i in not_select:
+            get_pressed(numberslist7[i-54])
+
+    for i in range(63,72):
+        if x1[i-63] < pos[0] < x1[i-62] and ys[7] < pos[1] < ys[8] and i in not_select:
+            get_pressed(numberslist8[i-63])
+
+    for i in range(72,81):
+        if x1[i-72] < pos[0] < x1[i-71] and ys[8] < pos[1] < ys[9] and i in not_select:
+            get_pressed(numberslist9[i-72])
+
+
+    a = ''
+
+    if square1 != []:
+        a = square1[-1]
+        new_board[0] = a
+
+
+    b = ''
+
+    if square2 != []:
+        b = square2[-1]
+        new_board[1] = b
+
+
+
+    c = ''
+
+    if square3 != []:
+        c = square3[-1]
+        new_board[2] = c
+
+    d = ''
+
+    if square4 != []:
+        d = square4[-1]
+        new_board[3] = d
+
+    e = ''
+
+    if square5 != []:
+        e = square5[-1]
+        new_board[4] = e
+
+    f = ''
+
+    if square6 != []:
+        f = square6[-1]
+        new_board[5] = f
+
+    g = ''
+
+    if square7 != []:
+        g = square7[-1]
+        new_board[6] = g
+
+    h = ''
+
+    if square8 != []:
+        h = square8[-1]
+        new_board[7] = h
+
+    i = ''
+
+    if square9 != []:
+        i = square9[-1]
+        new_board[8] = i
+
+    j = ''
+
+    if square10 != []:
+        j = square10[-1]
+        new_board[9] = j
+
+    k = ''
+
+    if square11 != []:
+        k = square11[-1]
+        new_board[10] = k
+
+    l = ''
+
+    if square12 != []:
+        l = square12[-1]
+        new_board[11] = l
+
+    m = ''
+
+    if square13 != []:
+        m = square13[-1]
+        new_board[12] = m
+
+    n = ''
+
+    if square14 != []:
+        n = square14[-1]
+        new_board[13] = n
+
+    o = ''
+
+    if square15 != []:
+        o = square15[-1]
+        new_board[14] = o
+
+    p = ''
+
+    if square16 != []:
+        p = square16[-1]
+        new_board[15] = p
+
+    q = ''
+
+    if square17 != []:
+        q = square17[-1]
+        new_board[16] = q
+
+    r = ''
+
+    if square18 != []:
+        r = square18[-1]
+        new_board[17] = r
+
+    s = ''
+
+    if square19 != []:
+        s = square19[-1]
+        new_board[18] = s
+
+    t = ''
+
+    if square20 != []:
+        t = square20[-1]
+        new_board[19] = t
+
+    u = ''
+
+    if square21 != []:
+        u = square21[-1]
+        new_board[20] = u
+
+    v = ''
+
+    if square22 != []:
+        v = square22[-1]
+        new_board[21] = v
+
+    w = ''
+
+    if square23 != []:
+        w = square23[-1]
+        new_board[22] = w
+
+    x = ''
+
+    if square24 != []:
+        x = square24[-1]
+        new_board[23] = x
+
+    y = ''
+
+    if square25 != []:
+        y = square25[-1]
+        new_board[24] = y
+
+    z = ''
+
+    if square26 != []:
+        z = square26[-1]
+        new_board[25] = z
+
+    a1 = ''
+
+    if square27 != []:
+        a1 = square27[-1]
+        new_board[26] = a1
+
+    b1 = ''
+
+    if square28 != []:
+        b1 = square28[-1]
+        new_board[27] = b1
+
+    c1 = ''
+
+    if square29 != []:
+        c1 = square29[-1]
+        new_board[28] = c1
+
+    d1 = ''
+
+    if square30 != []:
+        d1 = square30[-1]
+        new_board[29] = d1
+
+    e1 = ''
+
+    if square31 != []:
+        e1 = square31[-1]
+        new_board[30] = e1
+
+    f1 = ''
+
+    if square32 != []:
+        f1 = square32[-1]
+        new_board[31] = f1
+
+    g1 = ''
+
+    if square33 != []:
+        g1 = square33[-1]
+        new_board[32] = g1
+
+    h1 = ''
+
+    if square34 != []:
+        h1 = square34[-1]
+        new_board[33] = h1
+
+    i1 = ''
+
+    if square35 != []:
+        i1 = square35[-1]
+        new_board[34] = i1
+
+    j1 = ''
+
+    if square36 != []:
+        j1 = square36[-1]
+        new_board[35] =j1
+
+    k1 = ''
+
+    if square37 != []:
+        k1 = square37[-1]
+        new_board[36] = k1
+
+    l1 = ''
+
+    if square38 != []:
+        l1 = square38[-1]
+        new_board[37] = l1
+
+    m1 = ''
+
+    if square39 != []:
+        m1 = square39[-1]
+        new_board[38] = m1
+
+    n1 = ''
+
+    if square40 != []:
+        n1 = square40[-1]
+        new_board[39] = n1
+
+    o1 = ''
+
+    if square41 != []:
+        o1 = square41[-1]
+        new_board[40] = o1
+
+    p1 = ''
+
+    if square42 != []:
+        p1 = square42[-1]
+        new_board[41] = p1
+
+    q1 = ''
+
+    if square43 != []:
+        q1 = square43[-1]
+        new_board[42] = q1
+
+    r1 = ''
+
+    if square44 != []:
+        r1 = square44[-1]
+        new_board[43] = r1
+
+    s1 = ''
+
+    if square45 != []:
+        s1 = square45[-1]
+        new_board[44] = s1
+
+    t88 = ''
+
+    if square46 != []:
+        t88 = square46[-1]
+        new_board[45] = t88
+
+    u88 = ''
+
+    if square47 != []:
+        u88 = square47[-1]
+        new_board[46] = u88
+
+    v88 = ''
+
+    if square48 != []:
+        v88 = square48[-1]
+        new_board[47] = v88
+
+    w88 = ''
+
+    if square49 != []:
+        w88 = square49[-1]
+        new_board[48] = w88
+
+    x88 = ''
+
+    if square50 != []:
+        x88 = square50[-1]
+        new_board[49] = x88
+
+    y88 = ''
+
+    if square51 != []:
+        y88 = square51[-1]
+        new_board[50] = y88
+
+    z88 = ''
+
+    if square52 != []:
+        z88 = square52[-1]
+        new_board[51] = z88
+
+    a88 = ''
+
+    if square53 != []:
+        a88 = square53[-1]
+        new_board[52] = a88
+
+    b88 = ''
+
+    if square54 != []:
+        b88 = square54[-1]
+        new_board[53] = b88
+
+    a89 = ''
+
+    if square55 != []:
+        a89 = square55[-1]
+        new_board[54] = a89
+
+    b89 = ''
+
+    if square56 != []:
+        b89 = square56[-1]
+        new_board[55] = b89
+
+    c89 = ''
+
+    if square57 != []:
+        c89 = square57[-1]
+        new_board[56] = c89
+
+    d89 = ''
+
+    if square58 != []:
+        d89 = square58[-1]
+        new_board[57] = d89
+
+    e89 = ''
+
+    if square59 != []:
+        e89 = square59[-1]
+        new_board[58] = e89
+
+    f89 = ''
+
+    if square60 != []:
+        f89 = square60[-1]
+        new_board[59] = f89
+
+    g89 = ''
+
+    if square61 != []:
+        g89 = square61[-1]
+        new_board[60] = g89
+
+    h89 = ''
+
+    if square62 != []:
+        h89 = square62[-1]
+        new_board[61] = h89
+
+    i89 = ''
+
+    if square63 != []:
+        i89 = square63[-1]
+        new_board[62] = i89
+
+
+    a68 = ''
+
+    if square64 != []:
+        a68 = square64[-1]
+        new_board[63] = a68
+
+    b68 = ''
+
+    if square65 != []:
+        b68 = square65[-1]
+        new_board[64] = b68
+
+    c68 = ''
+
+    if square66 != []:
+        c68 = square66[-1]
+        new_board[65] = c68
+
+    d68 = ''
+
+    if square67 != []:
+        d68 = square67[-1]
+        new_board[66] = d68
+
+    e68 = ''
+
+    if square68 != []:
+        e68 = square68[-1]
+        new_board[67] = e68
+
+    f68 = ''
+
+    if square69 != []:
+        f68 = square69[-1]
+        new_board[68] = f68
+
+    g68 = ''
+
+    if square70 != []:
+        g68 = square70[-1]
+        new_board[69] = g68
+
+    h68 = ''
+
+    if square71 != []:
+        h68 = square71[-1]
+        new_board[70] = h68
+
+    i68 = ''
+
+    if square72 != []:
+        i68 = square72[-1]
+        new_board[71] = i68
+
+
+    a55 = ''
+
+    if square73 != []:
+        a55 = square73[-1]
+        new_board[72] = a55
+
+    b55 = ''
+
+    if square74 != []:
+        b55 = square74[-1]
+        new_board[73] = b55
+
+    c55 = ''
+
+    if square75 != []:
+        c55 = square75[-1]
+        new_board[74] = c55
+
+    d55 = ''
+
+    if square76 != []:
+        d55 = square76[-1]
+        new_board[75] = d55
+
+    e55 = ''
+
+    if square77 != []:
+        e55 = square77[-1]
+        new_board[76] = e55
+
+    f55 = ''
+
+    if square78 != []:
+        f55 = square78[-1]
+        new_board[77] = f55
+
+    g55 = ''
+
+    if square79 != []:
+        g55 = square79[-1]
+        new_board[78] = g55
+
+    h55 = ''
+
+    if square80 != []:
+        h55 = square80[-1]
+        new_board[79] = h55
+
+    i55 = ''
+
+    if square81 != []:
+        i55 = square81[-1]
+        new_board[80] = i55
+
+
+    liste1 = [a,b,c,d,e,f,g,h,i]
+    liste2 = [j,k,l,m,n,o,p,q,r]
+    liste3 = [s,t,u,v,w,x,y,z,a1]
+    liste4 = [b1, c1, d1, e1, f1, g1, h1, i1, j1]
+    liste5 = [k1, l1, m1, n1, o1, p1, q1, r1, s1]
+    liste6 = [t88, u88, v88, w88, x88, y88, z88, a88, b88]
+    liste7 = [a89, b89, c89, d89, e89, f89, g89, h89, i89]
+    liste8 = [a68, b68, c68, d68, e68, f68, g68, h68, i68]
+    liste9 = [a55, b55, c55, d55, e55, f55, g55, h55, i55]
+
+    for i in range(9):
+        screen.blit(font.render(str(liste1[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER))
+
+    for i in range(9):
+        screen.blit(font.render(str(liste2[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER + BOX_SIZE))
+
+    for i in range(9):
+        screen.blit(font.render(str(liste3[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER + BOX_SIZE*2))
+
+    for i in range(9):
+        screen.blit(font.render(str(liste4[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER + BOX_SIZE*3))
+
+    for i in range(9):
+        screen.blit(font.render(str(liste5[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER + BOX_SIZE*4))
+
+    for i in range(9):
+        screen.blit(font.render(str(liste6[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER + BOX_SIZE*5))
+
+    for i in range(9):
+        screen.blit(font.render(str(liste7[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER + BOX_SIZE*6))
+
+    for i in range(9):
+        screen.blit(font.render(str(liste8[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER + BOX_SIZE*7))
+
+    for i in range(9):
+        screen.blit(font.render(str(liste9[i]), True, BLACK), (X_START + BOX_CENTER + BOX_SIZE * i, Y_START + BOX_CENTER + BOX_SIZE*8))
+
+
+    if new_board == finalboard:
+        win_screen()
+
+
+    pygame.display.update()
+    pygame.display.flip()
+
+
+    clock.tick(60)
+
+pygame.quit()
+

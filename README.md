@@ -1,2 +1,2 @@
 # learningpython
-# In python 2
+In python2
